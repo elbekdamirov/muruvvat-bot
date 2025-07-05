@@ -1,62 +1,52 @@
+// src/bot/models/bot.model.ts
+
 import {
-  Column,
-  DataType,
-  Model,
-  PrimaryKey,
   Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
 } from 'sequelize-typescript';
 
 interface IBotCreationAttr {
-  user_id: string | undefined;
-  first_name: string | undefined;
-  last_name: string | undefined;
-  lang: string | undefined;
-  name: string | undefined;
-  role: string | undefined;
-  phone_number: string | undefined;
-  last_state: string | undefined;
+  user_id: number;
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  lang?: string;
+  name?: string;
+  role?: string;
+  last_state?: string;
+  status?: boolean;
 }
 
-@Table({ tableName: 'user' })
+@Table({ tableName: 'users', timestamps: false })
 export class Bot extends Model<Bot, IBotCreationAttr> {
-  @Column({
-    type: DataType.STRING,
-    primaryKey: true,
-  })
-  declare user_id: string | undefined;
+  @PrimaryKey
+  @Column({ type: DataType.BIGINT })
+  declare user_id: number;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare first_name: string | undefined;
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare first_name: string;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare last_name: string | undefined;
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare last_name: string;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare lang: string | undefined;
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare lang: string;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare name: string | undefined;
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare name: string;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare role: string | undefined;
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare role: string;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare phone_number: string | undefined;
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  declare status: boolean;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare last_state: string | undefined;
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare phone_number: string;
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare last_state: string;
 }
