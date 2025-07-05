@@ -18,6 +18,7 @@ interface IBotCreationAttr {
   role?: string;
   last_state?: string;
   status?: boolean;
+  location?: string;
 }
 
 @Table({ tableName: 'users', timestamps: false })
@@ -46,6 +47,9 @@ export class Bot extends Model<Bot, IBotCreationAttr> {
 
   @Column({ type: DataType.STRING, allowNull: true })
   declare phone_number: string;
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare location: string;
 
   @Column({ type: DataType.STRING, allowNull: true })
   declare last_state: string;

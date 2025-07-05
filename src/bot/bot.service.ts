@@ -40,9 +40,12 @@ export class BotService {
     }
   }
 
-  async ClickSahiy(ctx: Context) {
+  async ClickRole(ctx: Context) {
     try {
-      const user_id = ctx.callbackQuery!['data'].split('__')[1];
+      const callbackData =
+        'data' in ctx.callbackQuery! ? ctx.callbackQuery.data : '';
+      const [role, user_id] = callbackData.split('__');
+
       const user = await this.botModel.findOne({ where: { user_id } });
 
       if (!user) {
@@ -51,14 +54,14 @@ export class BotService {
           ...Markup.keyboard(['/start']).resize().oneTime(),
         });
       } else {
-        user.role = 'sahiy';
+        user.role = role; // 'sahiy' yoki 'sabrli'
         user.last_state = 'name';
         await user.save();
 
-        ctx.reply('Ismingizni kiriting:');
+        await ctx.reply('Ismingizni kiriting:');
       }
     } catch (error) {
-      console.log('Error on ClickSahiy: ', error);
+      console.log('Error on ClickRole:', error);
     }
   }
 
@@ -86,6 +89,20 @@ export class BotService {
           }
         }
       }
+
+      if (
+        user!.last_state === 'location' &&
+        'text' in ctx.message! &&
+        ctx.message.text === "O'tkazib yuborish"
+      ) {
+        user!.last_state = 'finish';
+        await user!.save();
+
+        await ctx.reply(
+          "Manzil kiritilmadi. Ro'yxatdan o'tish yakunlandi.",
+          Markup.removeKeyboard(),
+        );
+      }
     } catch (error) {
       console.log('Error on Text', error);
     }
@@ -108,13 +125,46 @@ export class BotService {
             await user.save();
             ctx.reply(
               'Manzilingizni kiriting:',
-              Markup.keyboard(["O'tkazib yuborish"]).resize(),
+              Markup.keyboard([
+                [Markup.button.locationRequest('📍 Lokatsiyani ulashish')],
+                ["O'tkazib yuborish"],
+              ]).resize(),
             );
           }
         }
       }
     } catch (error) {
       console.log('Error on Contact', error);
+    }
+  }
+
+  async location(ctx: Context) {
+    try {
+      const user_id = ctx.from?.id;
+      const user = await this.botModel.findOne({ where: { user_id } });
+
+      if (!user) {
+        await ctx.reply("Siz hali ro'yxatdan o'tmagansiz", {
+          parse_mode: 'HTML',
+          ...Markup.keyboard(['/start']).resize().oneTime(),
+        });
+      } else {
+        if (user.last_state === 'location') {
+          if ('location' in ctx.message!) {
+            const location = ctx.message.location;
+            user.location = `${location.latitude},${location.longitude}`;
+            user.last_state = 'finish';
+            await user.save();
+
+            await ctx.reply(
+              "Ro'yxatdan o'tish yakunlandi. Rahmat!",
+              Markup.removeKeyboard(),
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Error on Location:', error);
     }
   }
 

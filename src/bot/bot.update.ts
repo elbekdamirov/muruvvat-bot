@@ -11,9 +11,9 @@ export class BotUpdate {
     await this.botService.start(ctx);
   }
 
-  @Action(/^sahiy__+\d+/)
-  async onClickSahiy(@Ctx() ctx: Context) {
-    await this.botService.ClickSahiy(ctx);
+  @Action(/^(sahiy|sabrli)__\d+$/)
+  async onClickRole(@Ctx() ctx: Context) {
+    await this.botService.ClickRole(ctx);
   }
 
   @On('text')
@@ -24,6 +24,11 @@ export class BotUpdate {
   @On('contact')
   async contact(@Ctx() ctx: Context) {
     await this.botService.contact(ctx);
+  }
+
+  @On('location')
+  async location(@Ctx() ctx: Context) {
+    await this.botService.location(ctx);
   }
 
   @Command('stop')
